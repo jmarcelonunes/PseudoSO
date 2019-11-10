@@ -21,4 +21,11 @@ class Memory:
         else:
             InitialBlock = 64
             FinalBlock = 959
+        
+        #To Do:
+
+        #Check if the process is not too big to fit the blocks 
+
+
+        #Check if there is enough room for the process in the memory
 
