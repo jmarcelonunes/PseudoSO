@@ -9,7 +9,6 @@ Contiguous blocks of memory. Each process have to check if there is memory avaia
 class Memory:
 
     def __init__(self):
-        self.initialMemory = [None]*1024 #1024 blocks with null value
         self.allocfreelist_real = [{'start': 0 ,'length':64}]
         self.allocfreelist_user = [{'start': 64 ,'length':960}]
         self.alloc_oc_real = [{'pid': None, 'length': None, 'start': None}]
@@ -42,22 +41,30 @@ class Memory:
             return -1
 
         #Check if there is enough room for the process in the memory
-        for key in list_free_process: 
+        for key in list_free_process:
             if(key['length'] >= MemReq): #check if exist an element of the list with sufficient size    
                 element = {'pid': pid, 'start': key['start'] , 'length': MemReq} #creates the element for the occupied list #alterar para incluir a classe processo
                 key['start'] = key['start'] + MemReq #Updates the free list 
                 key['length'] = key['length'] - MemReq
                 list_oc_process.append(dict(element)) #append an element to the occupied list
-                
                 if(prio == 0):#alterar para incluir a classe processo
                     self.allocfreelist_real = list_free_process
                     self.alloc_oc_real = list_oc_process
                 else:
                     self.allocfreelist_user = list_free_process
                     self.alloc_oc_user = list_oc_process
+                self.adequateMemory()
                 return 1 
         print('Error no blocks available')
-        return -1             
+        return -1 
+    
+    def adequateMemory(self):  
+        for key in self.allocfreelist_real:
+            if(key['length'] == 0):
+                self.allocfreelist_real.remove(key)
+        for key in self.allocfreelist_user:
+            if(key['length'] == 0):
+                self.allocfreelist_real.remove(key)            
 
     def cleanMemory(self, numBlockMem, pid, prio):
         MemReq = numBlockMem #Size of the process #alterar para incluir a classe processo
@@ -85,11 +92,12 @@ class Memory:
                 return 1
 
     def __str__(self):
-        print ('Heloo')
+        print ('----------------------------------------------------------------------------------------------------')
         txt = 'Lista de Livres Tempo real: ' + str(self.allocfreelist_real) + '\n'
         txt += 'Lista de Ocupados Tempo real: ' + str(self.alloc_oc_real) + '\n'
         txt += 'Lista de Livres Usuario: ' + str(self.allocfreelist_user) + '\n'
         txt += 'Lista de Ocupados Usuario: ' + str(self.alloc_oc_user)
+        print ('----------------------------------------------------------------------------------------------------')
         return txt
 
 
