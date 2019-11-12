@@ -21,11 +21,11 @@ class FileSystem():
 				else:
 					print("Erro, não foi possível iniciar disco")
 
-	def hasSpace(self, fileInfo):
-		return True
-
 	def __str__(self):
 		txt = ''
 		for f in self.files:
 			txt += str(f) + '\n'
 		return txt
+
+	def hasSpace(self, fileInfo):
+		return True
