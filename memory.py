@@ -7,20 +7,34 @@ Contiguous blocks of memory. Each process have to check if there is memory avaia
 '''
 
 class Memory:
+
     def __init__(self):
-        self.initialMemory = [None]*1024 #1024 blocks with null values
+        self.initialMemory = [None]*1024 #1024 blocks with null value
+        self.allocfreelist_real = [{'start': 0 ,'length':64}]
+        self.allocfreelist_user = [{'start': 64 ,'length':960}]
+        self.alloc_oc_real = [{'pid': None, 'length': None, 'start': None}]
+        self.alloc_oc_user = [{'pid': None, 'length': None, 'start': None}]
 
-    def CheckAvailMemory(self, process):
+
+    def CheckAvailMemory(self, prio, numblock, pid):
         
-        MemReq = process.numBlockMem #Size of the process
-
+        MemReq = numblock #Size of the process #alterar para incluir a classe processo
+        counter = 0
         #Check process priority
-        if process.prioridade == '0': #Real-time process
+        if  prio == 0: #Real-time process alterar para incluir a classe processo
             InitialBlock = 0
             FinalBlock = 63
+            list_free_process = self.allocfreelist_real
+            list_oc_process = self.alloc_oc_real
         else:                         #User process
             InitialBlock = 64
             FinalBlock = 959
+            list_free_process = self.allocfreelist_user
+            list_oc_process = self.alloc_oc_user
+
+        #Test
+        print('Inital Block:', InitialBlock)
+        print('Final Block:', FinalBlock)
 
         #Check if the process is not too big to fit the blocks 
         if MemReq > (FinalBlock - InitialBlock):
@@ -28,48 +42,61 @@ class Memory:
             return -1
 
         #Check if there is enough room for the process in the memory
-        y = 0
-        for x in range(InitialBlock, FinalBlock + 1):
-            
-            if self.initialMemory[x] == None: #Not occupied
+        for key in list_free_process: 
+            if(key['length'] >= MemReq): #check if exist an element of the list with sufficient size    
+                element = {'pid': pid, 'start': key['start'] , 'length': MemReq} #creates the element for the occupied list #alterar para incluir a classe processo
+                key['start'] = key['start'] + MemReq #Updates the free list 
+                key['length'] = key['length'] - MemReq
+                list_oc_process.append(dict(element)) #append an element to the occupied list
                 
-                for y in range(x, FinalBlock + 1): 
-                    AvailSize = (y - x) 
-                    
-                    if y == FinalBlock: #If there is not enough space
-                        print("No sufficient memory")
-                        return -1
+                if(prio == 0):#alterar para incluir a classe processo
+                    self.allocfreelist_real = list_free_process
+                    self.alloc_oc_real = list_oc_process
+                else:
+                    self.allocfreelist_user = list_free_process
+                    self.alloc_oc_user = list_oc_process
+                return 1 
+        print('Error no blocks available')
+        return -1             
 
-                    if AvailSize == MemReq: #Check if the size is sufficient
-                        FinalBlockValue = y #Set the final allocation block
-                        break
-                    
-            if AvailSize == MemReq:
-                return FinalBlockValue
-            
-            if x == FinalBlock: #If there is none blank space
-                print("No sufficient memory")
-                return -1
-                        
-    def allocateMemory(self, process, FinalBlockValue):
-        InitialBlockValue = FinalBlockValue - process.numBlockMem
+    def cleanMemory(self, numBlockMem, pid, prio):
+        MemReq = numBlockMem #Size of the process #alterar para incluir a classe processo
         
-        for x in range(InitialBlockValue, FinalBlockValue):
-            self.initialMemory[x] = 1
+        if  prio == 0: #Real-time process alterar para incluir a classe processo
+            InitialBlock = 0
+            FinalBlock = 63
+            list_free_process = self.allocfreelist_real
+            list_oc_process = self.alloc_oc_real
+            print("PROCESSO DE TEMPO REAL")
+        else:                         #User process
+            InitialBlock = 64
+            FinalBlock = 959
+            list_free_process = self.allocfreelist_user
+            list_oc_process = self.alloc_oc_user
         
-        self.initialMemory[x + 1] = 1
         
-        return 1
+        for key in list_oc_process:
+             if(key['pid'] == pid): #check what is the element in the list
+                start = key['start'] #saves the start position
+                length = key['length'] #saves the length
+                list_oc_process.remove(key) #deletes the element from the list
+                element = {'start': key['start'] , 'lenght': MemReq} #creates the element for the free list
+                list_free_process.append(dict(element)) #append an element to the occupied list
+                return 1
 
-    # TO DO:
-    #Clean memory
-    #Run this code and debug (Especially Check Avail Memory)
-    
+    def __str__(self):
+        print ('Heloo')
+        txt = 'Lista de Livres Tempo real: ' + str(self.allocfreelist_real) + '\n'
+        txt += 'Lista de Ocupados Tempo real: ' + str(self.alloc_oc_real) + '\n'
+        txt += 'Lista de Livres Usuario: ' + str(self.allocfreelist_user) + '\n'
+        txt += 'Lista de Ocupados Usuario: ' + str(self.alloc_oc_user)
+        return txt
 
 
 
-        
-                
-            
-        
+
+
+
+
+
 
