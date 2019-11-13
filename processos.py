@@ -1,54 +1,58 @@
-'''
-	Módulo de Processos: carregamento dos dados do arquivo processes.txt e 
-	disponibilização em forma textual de cada processo.
+"""
+	Módulo de Processos: contém as classes Process e ProcessManager
+"""
 
-	Exemplos de uso deste módulo:
 
-	1) Carregar de um arquivo os dados dos processos:
-		1.1) processos = read_processes()
-		1.2) processos = read_processes('/home/aluno/SO/dados_processos.txt')
-
-	2) Recuperar em forma textual as informações de um processo e impressão via console:
-		print(processos[0])
-'''
-
-import re
-
-# Classe que contém todos os dados de um processo
-class Processo():
-	def __init__(self, tempoInit, prioridade, tempoProcessar, numBlockMem, \
-					codImpressora, reqScanner, reqModem, codDisco):
-		self.tempoInit = tempoInit
-		self.prioridade = prioridade
-		self.tempoProcessar = tempoProcessar
-		self.numBlockMem = numBlockMem
-		self.codImpressora = codImpressora
-		self.reqScanner = reqScanner
-		self.reqModem = reqModem
-		self.codDisco = codDisco
+class Process:
+	def __init__(self, init_time, priority, total_exec_time, blocks, \
+					print_cod, req_scanner, req_modem, disk_cod, pid=-1):
+		self.init_time = init_time
+		self.priority = priority
+		self.total_exec_time = total_exec_time
+		self.blocks = blocks
+		self.print_cod = print_cod
+		self.req_scanner = req_scanner
+		self.req_modem = req_modem
+		self.disk_cod = disk_cod
+		self.pc = self.total_exec_time + self.init_time
+		# pid deve ser atribuído pelo gerenciador de processos
+		self.pid = pid
 	# Formato textual dos dados atuais do processo. Pode ser utilizado pelo dispatcher.
 	def __str__(self):
-		txt = 'offset: ' + str(self.tempoInit) + '\n'
-		txt += 'blocks: ' + str(self.numBlockMem) + '\n'
-		txt += 'priority: ' + str(self.prioridade) + '\n'
-		txt += 'time: ' + str(self.tempoProcessar) + '\n'
-		txt += 'printers: ' + str(self.codImpressora) + '\n'
-		txt += 'scanners: ' + str(self.reqScanner) + '\n'
-		txt += 'modems: ' + str(self.reqModem) + '\n'
-		txt += 'drivers: ' + str(self.codDisco)
+		txt = '\tPID: ' + str(self.pid) + '\n'
+		txt += '\toffset: ' + str(self.init_time) + '\n'
+		txt += '\tblocks: ' + str(self.blocks) + '\n'
+		txt += '\tpriority: ' + str(self.priority) + '\n'
+		txt += '\ttime: ' + str(self.total_exec_time) + '\n'
+		txt += '\tprinters: ' + str(self.print_cod) + '\n'
+		txt += '\tscanners: ' + str(self.req_scanner) + '\n'
+		txt += '\tmodems: ' + str(self.req_modem) + '\n'
+		txt += '\tdrivers: ' + str(self.disk_cod)
 		return txt
 
 
-# Retorna uma lista com a instância de todos os Processos do arquivo .txt informado.
-# Cada linha do arquivo deve seguir o padrão: int, int, int, int, int, int, int, int
-# Sendo que, em ordem, cada valor int representa: <tempo de inicialização>, <prioridade>, 
-# <tempo de processador>, <blocos em memória>, <número-código da impressora requisitada>, 
-# <requisição do scanner>, <requisição do modem>, <número-código do disco>
-def read_processes(filename='processes.txt'):
-	processes = []
-	with open(filename, 'r') as arquivo:
-		line = re.sub('(\n|\r|\t| )*', '', arquivo.readline()) # Removemos \n, \r, \t e espaços de cada linha
-		d = line.split(',') # d: dados de um processo. Nome suscinto de variável, mas prático para a operação seguinte.
-		processes.append(Processo(int(d[0]), int(d[1]), int(d[2]), int(d[3]), int(d[4]), int(d[5]), int(d[6]), int(d[7])) )
-	return processes
+class ProcessManager:
+	def __init__(self):
+		# tempo de cpu total
+		self.clock = 0
+		# pid que será atribuído ao próximo processo que será criado
+		self.new_pid = 0
+		# processo atualmente em execução
+		self.running_proc = None
+		self.running_pid = 0
+		# processos que já foram executados
+		self.executed_procs = []
+
+	def create_process(self, proc):
+		proc.pid = self.new_pid
+		self.new_pid += 1
+		# aloca o processo na memoria
+		self.memmngr.allocate(proc)
+		# alloca os recursos do processo 
+		self.resmngr.allocate(proc)
+		# o processo é adicionado à fia
+		self.qmngr.put(proc)
+
+	def next_process(self):
+		return None
 
