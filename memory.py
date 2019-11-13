@@ -9,95 +9,95 @@ Contiguous blocks of memory. Each process have to check if there is memory avaia
 class Memory:
 
     def __init__(self):
-        self.allocfreelist_real = [{'start': 0 ,'length':64}]
-        self.allocfreelist_user = [{'start': 64 ,'length':960}]
-        self.alloc_oc_real = [{'pid': None, 'length': None, 'start': None}]
-        self.alloc_oc_user = [{'pid': None, 'length': None, 'start': None}]
-
-
-    def check_and_allocate(self, prio, numblock, pid):
+        self.memory_real_time = MemoryList(0, 64)
+        self.memory_user = MemoryList(64, 960)
         
-        mem_req = numblock #Size of the process #alterar para incluir a classe processo
+    def create_process(self, pid, prio, numblock):
+  
         #Check process priority
-        if  prio == 0: #Real-time process alterar para incluir a classe processo
-            initial_block = 0
-            final_block = 63
-            list_free_process = self.allocfreelist_real
-            list_oc_process = self.alloc_oc_real
-        else:                         #User process
-            initial_block = 64
-            final_block = 959
-            list_free_process = self.allocfreelist_user
-            list_oc_process = self.alloc_oc_user
-
-        #Test
-        print('Inital Block:', initial_block)
-        print('Final Block:', final_block)
-
-        #Check if the process is not too big to fit the blocks 
-        if mem_req > (final_block - initial_block):
-            print("The process is too big to fit our memory")
-            return -1
-
+        partition = self.memory_real_time if prio == 0 else self.memory_user
+        holes = partition.holes
+        processes = partition.processes
+        if partition.check_size(numblock):
+            raise Exception("Memory too small for the process")
         #Check if there is enough room for the process in the memory
-        for key in list_free_process:
-            if(key['length'] >= mem_req): #check if exist an element of the list with sufficient size    
-                element = {'pid': pid, 'start': key['start'] , 'length': mem_req} #creates the element for the occupied list #alterar para incluir a classe processo
-                key['start'] = key['start'] + mem_req #Updates the free list 
-                key['length'] = key['length'] - mem_req
-                list_oc_process.append(dict(element)) #append an element to the occupied list
-                if(prio == 0):#alterar para incluir a classe processo
-                    self.allocfreelist_real = list_free_process
-                    self.alloc_oc_real = list_oc_process
+        for hole in holes:
+            if(hole['length'] >= numblock): #check if exist an element of the list with sufficient size                  
+                #creates the element for the occupied list #alterar para incluir a classe processo
+                element = {'pid': pid, 
+                           'start': hole['start'], 
+                           'length': numblock
+                          }
+                hole['length'] -= numblock #Updates the free list
+                if hole['length'] == 0:
+                    holes.remove(hole)  
                 else:
-                    self.allocfreelist_user = list_free_process
-                    self.alloc_oc_user = list_oc_process
-                self.adequate_memory()
-                return 1 
-        print('Error no blocks available')
-        return -1 
-    
-    def adequate_memory(self):  
-        for key in self.allocfreelist_real:
-            if(key['length'] == 0):
-                self.allocfreelist_real.remove(key)
-        for key in self.allocfreelist_user:
-            if(key['length'] == 0):
-                self.allocfreelist_real.remove(key)            
+                    hole['start'] += numblock #Updates the free list
+                for index, process in enumerate(processes):
+                    if process['start'] > element['start']:
+                        processes.insert(index, element) #append an element to the occupied list
+                        return 0
+                processes.append(element) 
+                return 0
 
-    def delete_process(self, num_block_mem, pid, prio):
-        mem_req = num_block_mem #Size of the process #alterar para incluir a classe processo
+        return -1          
+
+    def delete_process(self, pid, prio):
+
+        partition = self.memory_real_time if prio == 0 else self.memory_user
+        holes = partition.holes
+        processes = partition.processes   
         
-        if  prio == 0: #Real-time process alterar para incluir a classe processo
-            initial_block = 0
-            final_block = 63
-            list_free_process = self.allocfreelist_real
-            list_oc_process = self.alloc_oc_real
-            print("PROCESSO DE TEMPO REAL")
-        else:                         #User process
-            initial_block = 64
-            final_block = 959
-            list_free_process = self.allocfreelist_user
-            list_oc_process = self.alloc_oc_user
-        
-        
-        for key in list_oc_process:
-             if(key['pid'] == pid): #check what is the element in the list
-                start = key['start'] #saves the start position
-                length = key['length'] #saves the length
-                list_oc_process.remove(key) #deletes the element from the list
-                element = {'start': key['start'] , 'lenght': mem_req} #creates the element for the free list
-                list_free_process.append(dict(element)) #append an element to the occupied list
-                return 1
+        for process in processes:
+            if(process['pid'] == pid): #check what is the element in the list
+                new_hole = {'start': process['start'], 'length': process['length']} #creates a new hole element
+                processes.remove(process) #deletes the element from the list
+
+                for index,hole in enumerate(holes):
+                    if hole['start'] > new_hole['start']:
+                        holes.insert(index,new_hole)
+                        self.colapse(holes, index)
+                        return 0
+                holes.append(new_hole)
+                self.colapse(holes, len(holes) - 1)
+                return 0
+        return -1
+
+    def colapse(self, holes, index):
+        next_index = index + 1
+        previous_index = index - 1
+        start = holes[index]['start']
+        end = start + holes[index]['length']
+        hole = holes[index]
+        if next_index < len(holes):
+            if holes[next_index]['start'] ==  end:
+                hole['length'] += holes[next_index]['length']
+                holes.pop(next_index)
+        if previous_index >= 0:
+            if (holes[previous_index]['start'] + holes[previous_index]['length']) == start:
+                holes[previous_index]['length'] += hole['length']
+                holes.pop(index)
+
 
     def __str__(self):
         print ('----------------------------------------------------------------------------------------------------')
-        txt = 'Lista de Livres Tempo real: ' + str(self.allocfreelist_real) + '\n'
-        txt += 'Lista de Ocupados Tempo real: ' + str(self.alloc_oc_real) + '\n'
-        txt += 'Lista de Livres Usuario: ' + str(self.allocfreelist_user) + '\n'
-        txt += 'Lista de Ocupados Usuario: ' + str(self.alloc_oc_user)
+        txt =  'Lista de Livres Tempo real: ' + str(self.memory_real_time.holes) + '\n'
+        txt += 'Lista de Ocupados Tempo real: ' + str(self.memory_real_time.processes) + '\n'
+        txt += 'Lista de Livres Usuario: ' + str(self.memory_user.holes) + '\n'
+        txt += 'Lista de Ocupados Usuario: ' + str(self.memory_user.processes)
         print ('----------------------------------------------------------------------------------------------------')
         return txt
+
+class MemoryList:
+    
+    def __init__(self, initial_block, final_block):
+        self.initial_block = initial_block
+        self.final_block = final_block
+        self.processes = []
+        self.holes = [{'start':initial_block, 'length':final_block}]
+        
+    def check_size(self,numblock):
+        return numblock > (self.final_block - self.initial_block)
 
 
 

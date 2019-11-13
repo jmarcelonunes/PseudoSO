@@ -1,12 +1,20 @@
 import memory
+try:
+    print("Hello World!")
+    memoria = memory.Memory()
 
-print("Hello World!")
-memoria = memory.Memory()
-memoria.check_and_allocate(0, 2, 1)
-print(memoria)
-memoria.check_and_allocate(0, 30, 2)
-print(memoria)
-memoria.check_and_allocate(0, 32, 3)
-print(memoria)
-memoria.delete_process(30,2,0)
-print(memoria)    
+    memoria.create_process(1,0,70)
+    print(memoria)
+
+    memoria.create_process(2,0,30)
+    print(memoria)
+    memoria.create_process(3,0,32)
+    print(memoria)
+    memoria.delete_process(2,0)
+    print(memoria)
+    memoria.delete_process(1,0)
+    print(memoria)
+    memoria.delete_process(3,0)
+    print(memoria)
+except Exception as e: 
+    print(e)
