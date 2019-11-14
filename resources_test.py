@@ -1,5 +1,10 @@
+"""
+	Some tests of the resources.py module
+"""
+
+
 from resources import ResourceManager
-from processos import Process
+from process import Process
 
 def original_procs():
 	return [{'priority': 0, 'printer_cod': 0, 'scanner': 0, 'modem': 0, 'disk_cod': 0}, \
@@ -43,5 +48,12 @@ print("\nVerificação de disponibilidade do modem e do disco para o processo 0.
 err_msgs = resmngr.resources_availability(procs_descr[0])
 assert len(err_msgs) == 2
 print(err_msgs)
-procs_descr = original_procs()
 err_msgs = []
+
+# Teste do método free()
+resmngr.free(process1)
+print("\nVerificação de disponibilidade do modem e do disco para o processo 0 depois de chamar free()...")
+err_msgs = resmngr.resources_availability(procs_descr[0])
+assert len(err_msgs) == 0
+print(err_msgs)
+
