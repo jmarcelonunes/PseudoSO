@@ -23,7 +23,7 @@ def read_processes(filename='processes.txt'):
 	"""
 	processes_descr = []
 	attrs = ['init_time', 'priority', 'total_exec_time', 'blocks', 'printer_cod', \
-				'req_scanner', 'req_modem', 'disk_cod']
+				'scanner', 'modem', 'disk_cod']
 	with open(filename, 'r') as fp:
 		for i, line in enumerate(fp):
 			# remove \n, \r, \t e espaços que estejam no início ou no fim de cada linha

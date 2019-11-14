@@ -5,14 +5,14 @@
 
 class Process:
 	def __init__(self, init_time, priority, total_exec_time, blocks, \
-					print_cod, req_scanner, req_modem, disk_cod, pid=-1):
+					printer_cod, scanner, modem, disk_cod, pid=-1):
 		self.init_time = init_time
 		self.priority = priority
 		self.total_exec_time = total_exec_time
 		self.blocks = blocks
-		self.print_cod = print_cod
-		self.req_scanner = req_scanner
-		self.req_modem = req_modem
+		self.printer_cod = printer_cod
+		self.scanner = scanner
+		self.modem = modem
 		self.disk_cod = disk_cod
 		self.pc = self.total_exec_time + self.init_time
 		# pid deve ser atribuído pelo gerenciador de processos
@@ -24,9 +24,9 @@ class Process:
 		txt += '\tblocks: ' + str(self.blocks) + '\n'
 		txt += '\tpriority: ' + str(self.priority) + '\n'
 		txt += '\ttime: ' + str(self.total_exec_time) + '\n'
-		txt += '\tprinters: ' + str(self.print_cod) + '\n'
-		txt += '\tscanners: ' + str(self.req_scanner) + '\n'
-		txt += '\tmodems: ' + str(self.req_modem) + '\n'
+		txt += '\tprinters: ' + str(self.printer_cod) + '\n'
+		txt += '\tscanners: ' + str(self.scanner) + '\n'
+		txt += '\tmodems: ' + str(self.modem) + '\n'
 		txt += '\tdrivers: ' + str(self.disk_cod)
 		return txt
 
