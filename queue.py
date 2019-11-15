@@ -7,16 +7,18 @@
 	starvation it's used the aging technique.
 """
 
-from processos import Processo
+from process import Process
 
 
 class ProcessesQueue():
 	'''Ready processes queue'''
 
-	def __main__(self, processos : list):
+	def __main__(self, processes : list):
 		# Max number of processes
 		self.max_procs = 1000
-		self.queue = _list_to_queue(processos[:self.max_procs])
+		# Queue where the keys are the processes priorities and the values are
+		# lists of processes, one list per key
+		self.queue = _list_to_queue(processes[:self.max_procs])
 
 	def _is_queue_free(self, priority):
 		"""
@@ -27,7 +29,6 @@ class ProcessesQueue():
 		"""
 		return len(self.queue[priority]) < self.max_procs
 
-	# Adiciona um Processo no fim da fila
 	def add(self, process):
 		"""
 			Adds a process at the end of the queue according to it's priority.
@@ -69,17 +70,19 @@ class ProcessesQueue():
 			a user process.
 		"""
 
-# Recebe uma lista de processos e retorna um dicionário com 4 chaves (0 a 3) 
-# sendo elas as prioridades dos processos e o valor é a lista de processos
-# que estão naquela prioridade
 def _list_to_queue(processes : list):
 	"""
 		Takes a list of processes and transforms into a dictionary, which is 
-		the own queue. For internal use.
+		the own queue. For internal use. The processes are ordered by init_time
+		attribute, in an ascending order. It takes the first 1000 processes from
+		the list and ignores the rest.
 	"""
 	dic = {0: [], 1: [], 2: [], 3: []}
-	for proc in processes:
-		dic[proc.prioridade].append(proc)
+	for proc_descr in processes[:1000]:
+		dic[proc_descr['priority']].append(proc_descr)
+	# Sort the processes by their initialization time, ascending order.
+	for k in dic.keys():
+		dic[k].sort(key=lambda process: process['init_time'])
 	return dic
 
 

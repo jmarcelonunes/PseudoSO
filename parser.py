@@ -4,12 +4,12 @@
 	Exemplos de uso deste módulo:
 
 	1) Carregar de um arquivo os dados dos processos:
-		1.1) processos = read_processes() # Assume que o arquivo 'processes.txt' está no diretório corrente
+		1.1) processos = read_processes() # Assume que o arquivo 'processes.txt' está no diretório ./test_files/
 		1.2) processos = read_processes('/home/aluno/SO/dados_processos.txt')
 """
 
 
-def read_processes(filename='processes.txt'):
+def read_processes(filename='test_files/processes.txt'):
 	"""Lê o txt informado e transforma em uma lista de descrição de processos.
 		Cada linha do arquivo deve seguir o padrão: int, int, int, int, int, int, int, int
 		sendo que, em ordem, cada valor int representa: <tempo de inicialização>, <priority>, 
