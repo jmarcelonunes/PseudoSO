@@ -72,6 +72,20 @@ class FileSystem():
                 space_count = 0
         return None
 
+    def __str__(self):
+        string = 'Mapa de ocupação do disco\n'
+        string += '|'
+        for idx, block in enumerate(self.disk):
+            if idx % 10 == 0:
+                string += '\n|'
+            if block is None:
+                string += ' |'
+            else:
+                string += block.name + '|'
+
+        string += '\n'
+        return string
+
 class File():
 	
     def __init__(self, name, size, process = None, start = None):
