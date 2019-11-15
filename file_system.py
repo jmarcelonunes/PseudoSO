@@ -6,37 +6,80 @@
 	Classe FileSystem
 '''
 class FileSystem():
-	def __init__(self, filename):
-		self.files = []
-		with open(filename, 'r') as f:
-			self.blocks = int(f.readline())
-			quant_files = int(f.readline())
-			for _ in range(quant_files):
-				new_file_info = f.readline().split(',')
-				map(str.strip, new_file_info)
-				newFile = {
-					'name' : new_file_info[0],
-					'initialBlock' : int(new_file_info[1]),
-					'fileSize' : int(new_file_info[2])
-				}
-				if self.has_space(newFile):
-					self.files.append(newFile)
-				else:
-					print("Erro, não foi possível iniciar disco")
+    def __init__(self, filename):
+        self.partition = None
+        self.disk = []
+        self.ftable = []
+        with open(filename, 'r') as f:
+			# Leitura de parâmetros do sistema de arquivos
+            self.disk = int(f.readline()) * None
 
-	def __str__(self):
-		txt = ''
-		for f in self.files:
-			txt += str(f) + '\n'
-		return txt
+			# Criação dos arquivos iniciais
+            quant_files = int(f.readline())
+            for _ in range(quant_files):
+                new_file_info = f.readline().split(',')
+                map(str.strip, new_file_info)
+                new_file = File(
+                    new_file_info[0], # Nome do arquivo
+                    int(new_file_info[2]), # Tamanho do arquivo
+                    start = int(new_file_info[1]) # Primeiro bloco
+                )
+                self.__add_file(new_file)
 
-	def has_space(self, fileInfo):
-		return True
+    def create_file(self, name, size, process):
+        if(name in self.ftable):
+            raise Exception("Arquivo com nome inválido")
+        else:
+            if not self.__add_file(File(name, size, process)):
+                raise Exception("Não há espaço no disco")
+
+    def delete_file(self, name, process): 
+        if(name not in self.ftable):
+            raise Exception("Arquivo não encontrado")
+        file = self.ftable[name]
+        if( process.priority != 0 and
+            file.process != process):
+            raise Exception("Processo não possui permissão de acesso")
+        self.__remove_file(file)
+
+    def __add_file(self, file):
+        if(file.start is None):
+            idx = self.__find_space(file.size)
+            if idx is not None:
+                file.set_start(idx)
+            else:
+                return False
+        
+        self.disk[file.start : file.end] =  file.size * file.name
+        self.ftable[file.name] = file.name
+        return True
+
+    def __remove_file(self, file):
+        if(file.name not in self.ftable):
+            return False
+        self.disk[file.start : file.end] =  file.size * None
+        del self.ftable[file.name]
+        return True
+
+    def __find_space(self, size):
+        space_count = 0
+        for idx, f in enumerate(self.disk):
+            if f is None:
+                space_count += 1
+                if space_count == size:
+                    return idx - size
+            else:
+                space_count = 0
+        return None
 
 class File():
+	
+    def __init__(self, name, size, process = None, start = None):
+        self.name = name
+        self.start = start
+        self.size = size
+        self.end = start + (size - 1)
 
-	def __init__(self,name,initialBlock,fileSize, permission):
-		self.name = name
-		self.initialBlock = initialBlock
-		self.fileSize = fileSize
-		self.permission = permission
+    def set_start(self, idx):
+        self.start = idx
+        self.end = self.start + (self.size - 1)
