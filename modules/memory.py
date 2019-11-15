@@ -10,7 +10,7 @@ class Memory:
 
     def __init__(self):
         self.memory_real_time = MemoryList(0, 64)
-        self.memory_user = MemoryList(64, 960)
+        self.memory_user = MemoryList(64, 1024)
         
     def create_process(self, pid, prio, numblock):
   
