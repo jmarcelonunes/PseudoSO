@@ -17,6 +17,7 @@ class FileSystem():
 			# Criação dos arquivos iniciais
             quant_files = int(f.readline())
             for _ in range(quant_files):
+                # Obtém informações de cada arquivo
                 new_file_info = f.readline().split(',')
                 map(str.strip, new_file_info)
                 new_file = File(
@@ -24,8 +25,11 @@ class FileSystem():
                     int(new_file_info[2]), # Tamanho do arquivo
                     start = int(new_file_info[1]) # Primeiro bloco
                 )
+
+                # Adiciona no sistema
                 self.__add_file(new_file)
 
+    # Cria a estrutura de arquivo e adiciona no sistema
     def create_file(self, name, size, process):
         if(name in self.ftable):
             raise Exception("Arquivo com nome inválido")
@@ -33,6 +37,8 @@ class FileSystem():
             if not self.__add_file(File(name, size, process)):
                 raise Exception("Não há espaço no disco")
 
+    # Deleta um arquivo do sistema pelo nome
+    # Além de verificar as permissões de acesso
     def delete_file(self, name, process): 
         if(name not in self.ftable):
             raise Exception("Arquivo não encontrado")
@@ -42,6 +48,7 @@ class FileSystem():
             raise Exception("Processo não possui permissão de acesso")
         self.__remove_file(file)
 
+    # Adiciona um arquivo no sistema
     def __add_file(self, file):
         if(file.start is None):
             idx = self.__find_space(file.size)
@@ -54,6 +61,7 @@ class FileSystem():
         self.ftable[file.name] = file.name
         return True
 
+    # Remove um arquivo do sistema
     def __remove_file(self, file):
         if(file.name not in self.ftable):
             return False
@@ -61,6 +69,8 @@ class FileSystem():
         del self.ftable[file.name]
         return True
 
+    # Obtém posição inicial de bloco refêrente a um
+    # espaço no disco de determinado tamanho
     def __find_space(self, size):
         space_count = 0
         for idx, f in enumerate(self.disk):
@@ -92,8 +102,8 @@ class File():
         self.name = name
         self.start = start
         self.size = size
-        self.end = start + (size - 1)
+        self.end = start + size
 
     def set_start(self, idx):
         self.start = idx
-        self.end = self.start + (self.size - 1)
+        self.end = self.start + self.size
