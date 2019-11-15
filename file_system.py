@@ -7,9 +7,8 @@
 '''
 class FileSystem():
     def __init__(self, filename):
-        self.partition = None
         self.disk = []
-        self.ftable = []
+        self.ftable = {}
         with open(filename, 'r') as f:
 			# Leitura de parâmetros do sistema de arquivos
             self.disk = int(f.readline()) * None
@@ -46,7 +45,8 @@ class FileSystem():
         if( process.priority != 0 and
             file.process != process):
             raise Exception("Processo não possui permissão de acesso")
-        self.__remove_file(file)
+        if not self.__remove_file(file):
+            raise Exception("Erro ao remover arquivo")
 
     # Adiciona um arquivo no sistema
     def __add_file(self, file):
@@ -77,7 +77,7 @@ class FileSystem():
             if f is None:
                 space_count += 1
                 if space_count == size:
-                    return idx - size
+                    return idx - (size - 1)
             else:
                 space_count = 0
         return None
