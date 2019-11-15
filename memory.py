@@ -19,7 +19,7 @@ class Memory:
         holes = partition.holes
         processes = partition.processes
         if partition.check_size(numblock):
-            raise Exception("Memory too small for the process")
+            raise Exception("O processo eh muito grande para ser alocado")
         #Check if there is enough room for the process in the memory
         for hole in holes:
             if(hole['length'] >= numblock): #check if exist an element of the list with sufficient size                  
@@ -40,7 +40,7 @@ class Memory:
                 processes.append(element) 
                 return 0
 
-        return -1          
+        raise Exception("Nao foram encontrados blocos disponiveis")         
 
     def delete_process(self, pid, prio):
 
@@ -56,14 +56,14 @@ class Memory:
                 for index,hole in enumerate(holes):
                     if hole['start'] > new_hole['start']:
                         holes.insert(index,new_hole)
-                        self.colapse(holes, index)
+                        self.compress(holes, index)
                         return 0
                 holes.append(new_hole)
-                self.colapse(holes, len(holes) - 1)
+                self.compress(holes, len(holes) - 1)
                 return 0
-        return -1
+        raise Exception("O processo nao foi excluido da memoria")
 
-    def colapse(self, holes, index):
+    def compress(self, holes, index):
         next_index = index + 1
         previous_index = index - 1
         start = holes[index]['start']
