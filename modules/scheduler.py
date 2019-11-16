@@ -1,7 +1,9 @@
+from queue import ProcessesQueue
+
 class Scheduler():
 
     def __init__(self):
-        self.ready = []
+        self.ready = ProcessesQueue()
         self.blocked = []
         self.waiting = []
         self.finished = []
@@ -10,7 +12,10 @@ class Scheduler():
     def update(self):
         # Aging
             # Na fila de prontos
-            # Todo clock aumenta a prioridade de todos
+            # Todo clock aumenta a prioridade do primeiro processo que está
+				# na fila de prioridade 2 ou 3
+			ready.process_aging()
+		
         # Blocked processes
             # Motivos
                 # Recurso - Ex: Impressora
@@ -20,10 +25,11 @@ class Scheduler():
             # Adiciona na lista de prontos
         pass
 
-    def send_ready_process(self, process):
+    def send_ready_process(self, processes):
         # Recebe novos processos
         # Adiciona na fila de prontos
-        pass
+			for proc in processes:
+				ready.add(proc)
 
     def get_process_to_execute(self):
         # verifica tempo de CPU do atual
