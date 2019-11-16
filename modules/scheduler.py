@@ -38,3 +38,8 @@ class Scheduler():
                 # retorna melhor candidato
         # retorna IDLE
         pass
+
+    def waiting_is_filled(self):
+        # Retorna True ou False se ainda há processos que não
+        # foram executados
+        pass
