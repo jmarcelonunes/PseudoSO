@@ -10,6 +10,7 @@ class Process:
 		self.init_time = init_time
 		self.priority = priority
 		self.total_exec_time = total_exec_time
+		self.exec_time = total_exec_time #contador do tempo de cpu
 		self.blocks = blocks
 		self.printer_cod = printer_cod
 		self.scanner = scanner

@@ -82,7 +82,15 @@ class Memory:
             if (holes[previous_index]['start'] + holes[previous_index]['length']) == start:
                 holes[previous_index]['length'] += hole['length']
                 holes.pop(index)
-
+    
+    def get_process_offset(self, process):
+        pid = process.pid
+        prio = process.priority
+        partition = self.memory_real_time if prio == 0 else self.memory_user
+        processes = partition.processes  
+        for process in processes:
+            if(process['pid'] == pid): #check what is the element in the list
+               return process['start']
 
     def __str__(self):
         print ('----------------------------------------------------------------------------------------------------')

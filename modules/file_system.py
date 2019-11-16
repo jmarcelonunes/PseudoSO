@@ -5,6 +5,8 @@
 '''
 	Classe FileSystem
 '''
+from modules import process
+
 class FileSystem():
     def __init__(self, filename):
         self.disk = []
@@ -29,24 +31,28 @@ class FileSystem():
                 self.__add_file(new_file)
 
     # Cria a estrutura de arquivo e adiciona no sistema
-    def create_file(self, name, size, process):
+    def create_file(self, instruction, process):
+        name = instruction.filename
+        size = instruction.size
         if(name in self.ftable):
             raise Exception("Arquivo com nome inválido")
         else:
             if not self.__add_file(File(name, size, process)):
-                raise Exception("Não há espaço no disco")
-
+                raise Exception("O processo %d não pode criar o arquivo %d por falta de espaço", process.pid, name)
+            file = self.ftable[name]
+            return file
     # Deleta um arquivo do sistema pelo nome
     # Além de verificar as permissões de acesso
-    def delete_file(self, name, process): 
+    def delete_file(self, instruction, process): 
+        name = instruction.filename
         if(name not in self.ftable):
             raise Exception("Arquivo não encontrado")
         file = self.ftable[name]
         if( process.priority != 0 and
             file.process != process):
-            raise Exception("Processo não possui permissão de acesso")
+            raise Exception("Processo %d não possui permissão de acesso", process.pid)
         if not self.__remove_file(file):
-            raise Exception("Erro ao remover arquivo")
+            raise Exception("Erro ao remover arquivo %d", name)
 
     # Adiciona um arquivo no sistema
     def __add_file(self, file):
