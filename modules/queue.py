@@ -16,18 +16,20 @@ class ProcessesQueue():
 	def __main__(self, processes : list):
 		# Max number of processes
 		self.max_procs = 1000
+		# Total number of processes in the queue
+		self.queue_size = 0
 		# Queue where the keys are the processes priorities and the values are
 		# lists of processes, one list per key
-		self.queue = _list_to_queue(processes[:self.max_procs])
+		self.queue = {}
 
-	def _is_queue_free(self, priority):
+	def _is_queue_free(self):
 		"""
 			Verifies if the queue has a slot for the process. For internal use.
 
 			Returns:
 				isFree ('bool')
 		"""
-		return len(self.queue[priority]) < self.max_procs
+		return self.queue_size < self.max_procs
 
 	def add(self, process):
 		"""
@@ -36,19 +38,34 @@ class ProcessesQueue():
 			Returns:
 				added ('bool')
 		"""
-		if(is_queue_free(process.priority)):
+		if(is_queue_free()):
 			self.queue[process.priority].append(process)
+			self.queue_size += 1
 			return True
 		return False
 
-	# Retorna e remove da Fila o próximo processo a ser executado.
-	# Armazena dados estatísticos para saber quantas vezes este
-	# processo foi executado. <-------------
-	def next(self):
+	def remove(self, process):
+		pass
+
+	def process_aging(self):
+		"""
+			Updates the priority of the processes at index 0 in the lists of
+			priority 2 and 3.
+		"""
+		if len(self.queue[2]) > 0:
+			proc = self.queue[2].pop(0)
+			proc.priority -= 1
+			add(proc)
+		if len(self.queue[3]) > 0:
+			proc = self.queue[3].pop(0)
+			proc.priority -= 1
+			add(proc)
+
+	def get_next(self):
 		"""
 			The next process of the queue according to the priority. Processes 
-			with priority 0 first, then 1 until 3. The process is removed from
-			the queue and returned to the caller block.
+			with priority 0 first, then 1 until 3. The process is returned and
+			the queue stays unchanged.
 
 			Returns:
 				Process ('obj') next Process with the highest priority in the queue
@@ -57,32 +74,7 @@ class ProcessesQueue():
 		for k in self.queue.keys():
 			if len(self.queue[k]) == 0:
 				continue
-			return self.queue[k].pop(0)
+			return self.queue[k][0]
 		return None
-
-
-	def aging(self):
-		"""
-			TODO
-			Technique to avoid starvation. The older the process is, more priority
-			it takes. Every 7 clocks the user processes that were not executed will
-			gain 1 more priority level until they have priority 1, the maximum for
-			a user process.
-		"""
-
-def _list_to_queue(processes : list):
-	"""
-		Takes a list of processes and transforms into a dictionary, which is 
-		the own queue. For internal use. The processes are ordered by init_time
-		attribute, in an ascending order. It takes the first 1000 processes from
-		the list and ignores the rest.
-	"""
-	dic = {0: [], 1: [], 2: [], 3: []}
-	for proc_descr in processes[:1000]:
-		dic[proc_descr['priority']].append(proc_descr)
-	# Sort the processes by their initialization time, ascending order.
-	for k in dic.keys():
-		dic[k].sort(key=lambda process: process['init_time'])
-	return dic
 
 
