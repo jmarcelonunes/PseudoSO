@@ -67,19 +67,19 @@ def load_instructions(filename, processes):
 			line = line.strip()
 			data = line.split(',')
 
-			process_id = data[0]
-			operation = data[1]
+			process_id = int(data[0])
+			operation = int(data[1])
 			filename = data[2]
 			if len(data) == 5:
-				filesize = data[3]
-				pc = data[4]
+				filesize = int(data[3])
+				pc = int(data[4])
 				inst = Instruction(
 					operation = operation,
 					filename = filename,
 					filesize = filesize
 				)
 			else:
-				pc = data[3]
+				pc = int(data[3])
 				inst = Instruction(
 					operation = operation,
 					filename = filename
