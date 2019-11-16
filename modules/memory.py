@@ -10,10 +10,13 @@ class Memory:
 
     def __init__(self):
         self.memory_real_time = MemoryList(0, 64)
-        self.memory_user = MemoryList(64, 960)
+        self.memory_user = MemoryList(64, 1024)
         
-    def create_process(self, pid, prio, numblock):
+    def create_process(self, process):
   
+        pid = process.pid
+        prio = process.priority
+        numblock = process.numblock
         #Check process priority
         partition = self.memory_real_time if prio == 0 else self.memory_user
         holes = partition.holes
@@ -42,7 +45,9 @@ class Memory:
 
         raise Exception("Nao foram encontrados blocos disponiveis")         
 
-    def delete_process(self, pid, prio):
+    def delete_process(self, process):
+        pid = process.pid
+        prio = process.priority
 
         partition = self.memory_real_time if prio == 0 else self.memory_user
         holes = partition.holes

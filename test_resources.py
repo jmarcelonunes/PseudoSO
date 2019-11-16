@@ -15,7 +15,7 @@ resmngr = ResourceManager()
 
 # Teste do método resources_availability()
 for i, proc in enumerate(procs_descr):
-	print(f'Verificação de disponibilidade de recursos do processo {i}...')
+	print('Verificação de disponibilidade de recursos do processo {i}...')
 	assert resmngr.resources_availability(proc) == []
 
 # Processo com prioridade 0 (de tempo real) tentando utilizar scanner
