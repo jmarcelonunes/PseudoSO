@@ -7,6 +7,7 @@ from modules.memory import Memory
 from modules.resources import ResourceManager
 
 GLOBAL_processes = []
+GLOBAL_clock = 0
 
 def main():
     # Obtendo argumentos do terminal
@@ -20,7 +21,7 @@ def main():
     process_filename = args[0]
     files_filename = args[1]
 
-    clock = 0
+    GLOBAL_clock = 0
 
     # Inicializar sistemas 
 
@@ -47,7 +48,7 @@ def main():
         # timer (clock)
             # retorna processos ou lista de processo
             # pelo clock
-        proc_list = process_launcher(clock, processes)
+        proc_list = process_launcher(GLOBAL_clock, processes)
 
         # atualiza escalonador
             # checar bloqueados no escalonador
@@ -61,7 +62,9 @@ def main():
         process_running = scheduler.get_process_to_execute(process_running)
         # dispatcher
         dispatch(process_running, memory, filesys, resources)
-        clock += 1
+        
+        GLOBAL_clock += 1
+        print(GLOBAL_clock)
 
 def process_launcher(clock, processes):
     if clock in processes:
@@ -69,6 +72,10 @@ def process_launcher(clock, processes):
     return []
 
 def dispatch(process, memory, filesys, resources):
+    # print(GLOBAL_clock)
+    # Não há processo a ser enviado a CPU
+    if process is None:
+        return
     # se novo processo imprimir informacoes gerais
     if process.new:
         process.new = False

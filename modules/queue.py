@@ -39,7 +39,7 @@ class ProcessesQueue():
 			Returns:
 				added ('bool')
 		"""
-		if(_is_queue_free()):
+		if(self._is_queue_free()):
 			self.queue[process.priority].append(process)
 			self.queue_size += 1
 			return True
@@ -56,11 +56,11 @@ class ProcessesQueue():
 		if len(self.queue[2]) > 0:
 			proc = self.queue[2].pop(0)
 			proc.priority -= 1
-			add(proc)
+			self.add(proc)
 		if len(self.queue[3]) > 0:
 			proc = self.queue[3].pop(0)
 			proc.priority -= 1
-			add(proc)
+			self.add(proc)
 
 	def get_next(self):
 		"""

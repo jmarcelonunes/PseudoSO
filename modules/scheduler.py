@@ -42,7 +42,7 @@ class Scheduler():
                 self.resource_m.allocate(proc)
                 self.ready.add(proc)
             except:
-                self.bloqued.push(proc)
+                self.blocked.push(proc)
 
     def pop_waiting(self):
         # Recebe novos processos
@@ -58,11 +58,14 @@ class Scheduler():
 
     def get_process_to_execute(self, running_process):
         # verifica tempo de CPU do atual
-        is_running = running_process.running
-        prio = running_process.priority
-        if not is_running:
-            self.mem_m.delete_process(running_process)
-            self.bloqued.pop_ready()
+        if running_process is not None:
+            is_running = running_process.running
+            prio = running_process.priority
+            if not is_running:
+                self.mem_m.delete_process(running_process)
+                self.blocked.pop_ready()
+        else:
+            is_running = False
         #loop - enquanto filas n estiverem vazia
         next = self.ready.get_next()
         while(next is not None):
@@ -72,13 +75,13 @@ class Scheduler():
             if is_running:
                 if prio != 0 and prio <= next.priority:  
                     # verifica recurso de memória
-                    next = verify_requirements(next)
+                    next = self.verify_requirements(next)
                     if  next is not None:
                         return next
                 else:
                     return running_process
             else: # Tempo de CPU acabou
-                next = verify_requirements(next)
+                next = self.verify_requirements(next)
                 if  next is not None:
                     return next # retorna melhor candidato
             next = self.ready.get_next()
@@ -91,5 +94,5 @@ class Scheduler():
             return self.ready.next()
         except:
             blocked_process = self.ready.next()
-            self.blocked.append(blocked_process)
+            self.blocked.push(blocked_process)
             return None
