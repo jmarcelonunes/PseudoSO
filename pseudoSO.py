@@ -40,11 +40,10 @@ def main():
     scheduler = Scheduler(resources, memory)
 
    
-
     process_running = None 
-
+    print(GLOBAL_processes)
     # loop pelo clock ate lista de processos gerais ficar vazia
-    while not GLOBAL_processes:
+    while GLOBAL_processes:
         # timer (clock)
             # retorna processos ou lista de processo
             # pelo clock
