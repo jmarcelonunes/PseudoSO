@@ -5,6 +5,7 @@
 from .parser import read_processes
 
 class Process:
+<<<<<<< HEAD
     def __init__(self, init_time, priority, total_exec_time, blocks, \
                     printer_cod, scanner, modem, disk_cod, pid = -1):
         self.init_time = init_time
@@ -36,6 +37,40 @@ class Process:
         txt += '\tinstructions: ' + str(self.instructions)
         
         return txt
+=======
+	def __init__(self, init_time, priority, total_exec_time, blocks, \
+					printer_cod, scanner, modem, disk_cod, pid = -1):
+		self.init_time = init_time
+		self.priority = priority
+		self.total_exec_time = total_exec_time
+		self.exec_time = total_exec_time #contador do tempo de cpu
+		self.blocks = blocks
+		self.printer_cod = printer_cod
+		self.scanner = scanner
+		self.modem = modem
+		self.disk_cod = disk_cod
+		self.pc = self.total_exec_time + self.init_time
+		# pid deve ser atribuído pelo gerenciador de processos
+		self.pid = pid
+		self.instructions = {}
+		self.intructions_pc = 0
+		self.running = False # processo está na memória ou não
+		
+	# Formato textual dos dados atuais do processo. Pode ser utilizado pelo dispatcher.
+	def __str__(self):
+		txt = '\tPID: ' + str(self.pid) + '\n'
+		txt += '\toffset: ' + str(self.init_time) + '\n'
+		txt += '\tblocks: ' + str(self.blocks) + '\n'
+		txt += '\tpriority: ' + str(self.priority) + '\n'
+		txt += '\ttime: ' + str(self.total_exec_time) + '\n'
+		txt += '\tprinters: ' + str(self.printer_cod) + '\n'
+		txt += '\tscanners: ' + str(self.scanner) + '\n'
+		txt += '\tmodems: ' + str(self.modem) + '\n'
+		txt += '\tdrivers: ' + str(self.disk_cod) + '\n'
+		txt += '\tinstructions: ' + str(self.instructions)
+		
+		return txt
+>>>>>>> pseudoSO
 
 
 def load_processes(processes_txt,files_txt):
@@ -66,6 +101,7 @@ def load_instructions(filename, processes):
             line = line.strip()
             data = line.split(',')
 
+<<<<<<< HEAD
             process_id = data[0]
             operation = data[1]
             filename = data[2]
@@ -84,6 +120,26 @@ def load_instructions(filename, processes):
                     filename = filename
                 )
             processes[process_id].instrutions[pc] = inst
+=======
+			process_id = int(data[0])
+			operation = int(data[1])
+			filename = data[2]
+			if len(data) == 5:
+				filesize = int(data[3])
+				pc = int(data[4])
+				inst = Instruction(
+					operation = operation,
+					filename = filename,
+					filesize = filesize
+				)
+			else:
+				pc = int(data[3])
+				inst = Instruction(
+					operation = operation,
+					filename = filename
+				)
+			processes[process_id].instrutions[pc] = inst
+>>>>>>> pseudoSO
 
     process_by_init_time = {}
     for p in processes:
