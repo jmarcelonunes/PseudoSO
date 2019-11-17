@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
     Resources Module
 
@@ -51,6 +52,8 @@ class ResourceManager:
         """
         try:
             resources_availability(process)
+        except Exception as e:
+            raise e
 
         proc_printer_idx = process.printer_cod -1
         proc_disk_idx = process.disk_cod -1

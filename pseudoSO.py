@@ -1,9 +1,13 @@
+# -*- coding: utf-8 -*-
 import sys
-from modules.process import load_processes
+from modules.process import load_processes, processes_by_init_time
 from modules.file_system import FileSystem
 from modules.scheduler import Scheduler
 from modules.memory import Memory
 from modules.resources import ResourceManager
+
+GLOBAL_processes = []
+
 def main():
     # Obtendo argumentos do terminal
     args_length = len(sys.argv) - 1
@@ -20,12 +24,8 @@ def main():
 
     # Inicializar sistemas 
 
-    # processos
-        # ler os processos do arquivo de processos
-        # ler as requisições de arquivos
-    processes = load_processes(process_filename, files_filename)
-
-    # memória
+    GLOBAL_processes = load_processes(process_filename, files_filename)
+    processes = processes_by_init_time(GLOBAL_processes)
     memory = Memory()
 
     # sistema de arquivos
@@ -33,17 +33,18 @@ def main():
         # adicionar dados do arquivo
     filesys = FileSystem(files_filename)
 
-    # escalonador
-    scheduler = Scheduler()
-
     #recursos
     resources = ResourceManager()
 
-    # processo em execução
+    # escalonador
+    scheduler = Scheduler(resources, memory)
+
+   
+
     process_running = None 
 
-    # loop pelo clock até lista de processos gerais ficar vazia
-    while scheduler.waiting_is_filled():
+    # loop pelo clock ate lista de processos gerais ficar vazia
+    while not GLOBAL_processes:
         # timer (clock)
             # retorna processos ou lista de processo
             # pelo clock
@@ -57,7 +58,7 @@ def main():
         # envia pacote para o escalonador
         scheduler.send_ready_process(proc_list)
         # escalonador retorna processo a ser executado
-            # retorna sinal se é pra trocar ou não o processo atual
+            # retorna sinal se eh pra trocar ou nao o processo atual
         process_running = scheduler.get_process_to_execute()
         # dispatcher
         dispatch(process_running, memory, filesys, resources)
@@ -69,7 +70,7 @@ def process_launcher(clock, processes):
     return []
 
 def dispatch(process, memory, filesys, resources):
-    # se novo processo imprimir informações gerais
+    # se novo processo imprimir informacoes gerais
     if process.new:
         process.new = False
         print("Dispatcher =>")
@@ -120,6 +121,7 @@ def dispatch(process, memory, filesys, resources):
         print("\tP%d instruction %d – FALHA", process.pid, process.intructions_pc)
         print("O processo %d esgotou o seu tempo de CPU!" , process.pid) 
         process.running = False
+        GLOBAL_processes.pop(process.pid)
 
     
  

@@ -1,16 +1,18 @@
-from queue import ProcessesQueue
+# -*- coding: utf-8 -*-
+from modules.queue import ProcessesQueue, BloquedQueue
 
 class Scheduler():
-    
+
     def __init__(self, resource_manager, memory):
+        
         self.ready = ProcessesQueue()
-        self.blocked = BloquedManager()
+        self.blocked = BloquedQueue(resource_manager)
         self.waiting = []
         self.finished = []
         self.resource_m = resource_manager
         self.mem_m = memory
         self.running = None
-
+        
     def update(self):
         # Aging
         # Na fila de prontos

@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 """
-    Process module: contains the Process and ProcessManager classes. 
+	Process module: contains the Process and ProcessManager classes. 
 """
 
 from .parser import read_processes
@@ -41,32 +42,33 @@ class Process:
 
 
 def load_processes(processes_txt,files_txt):
-    processes_dict = read_processes(filename = processes_txt)
-    processes = []
-    for key, p in enumerate(processes_dict):
-        new_process = Process(
-            p['init_time'], 
-            p['priority'], 
-            p['total_exec_time'], 
-            p['blocks'],
-            p['printer_cod'], 
-            p['scanner'], 
-            p['modem'], 
-            p['disk_cod'],
-            pid = key
-        )
-        processes.append(new_process)
-    return load_instructions(files_txt, processes)
+	processes_dict = read_processes(filename = processes_txt)
+	processes = []
+	for key, p in enumerate(processes_dict):
+		new_process = Process(
+			p['init_time'], 
+			p['priority'], 
+			p['total_exec_time'], 
+			p['blocks'],
+			p['printer_cod'], 
+			p['scanner'], 
+			p['modem'], 
+			p['disk_cod'],
+			pid = key
+		)
+		processes.append(new_process)
+	return load_instructions(files_txt, processes)
 
 def load_instructions(filename, processes):
 
-    with open(filename, 'r') as fp:
-        quant_files = fp[1]
-        fp = fp[(quant_files + 2):]
-        for line in fp:
-            # remove \n, \r, \t e espaços que estejam no início ou no fim de cada linha
-            line = line.strip()
-            data = line.split(',')
+	with open(filename, 'r') as fp:
+		fp.readline()
+		quant_files = int(fp.readline())
+		for _ in range(quant_files):
+			next(fp)
+		for line in fp:
+			line = line.strip()
+			data = line.split(',')
 			process_id = int(data[0])
 			operation = int(data[1])
 			filename = data[2]
@@ -84,32 +86,34 @@ def load_instructions(filename, processes):
 					operation = operation,
 					filename = filename
 				)
-			processes[process_id].instrutions[pc] = inst
+			processes[process_id].instructions[pc] = inst
+	return processes
 
-    process_by_init_time = {}
-    for p in processes:
-        if p.init_time in process_by_init_time:
-            process_by_init_time[p.init_time].append(p)
-        else:    
-            process_by_init_time[p.init_time] = [p]
+def processes_by_init_time(processes):
+	process_by_init_time = {}
+	for p in processes:
+		if p.init_time in process_by_init_time:
+			process_by_init_time[p.init_time].append(p)
+		else:    
+			process_by_init_time[p.init_time] = [p]
 
-    return process_by_init_time
+	return process_by_init_time
 
 class Instruction():
-    def __init__(self, operation = -1, filename = None, filesize = -1):
-        self.operation = operation
-        self.filename = filename
-        self.filesize = filesize
-    
-    def __str__(self):
-        string = 'Instrução: '
-        if self.operation == -1:
-            string += 'CPU'
-        elif self.operation == 0:
-            string += 'Criar arquivo' + self.filename
-        elif self.operation == 1:
-            string += 'Deleta arquivo' + self.filename
-        else:
-            string += 'Operação desconhecida'
-        return string
+	def __init__(self, operation = -1, filename = None, filesize = -1):
+		self.operation = operation
+		self.filename = filename
+		self.filesize = filesize
+	
+	def __str__(self):
+		string = 'Instrução: '
+		if self.operation == -1:
+			string += 'CPU'
+		elif self.operation == 0:
+			string += 'Criar arquivo' + self.filename
+		elif self.operation == 1:
+			string += 'Deleta arquivo' + self.filename
+		else:
+			string += 'Operação desconhecida'
+		return string
 

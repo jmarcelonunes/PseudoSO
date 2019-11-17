@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 	Módulo do Sistema de Arquivos
 '''
@@ -13,7 +14,8 @@ class FileSystem():
         self.ftable = {}
         with open(filename, 'r') as f:
 			# Leitura de parâmetros do sistema de arquivos
-            self.disk = int(f.readline()) * None
+            disk_size = int(f.readline())
+            self.disk =  disk_size * [None]
 
 			# Criação dos arquivos iniciais
             quant_files = int(f.readline())

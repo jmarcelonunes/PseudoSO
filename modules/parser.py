@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 	Carregamento dos dados do arquivo processes.txt.
 

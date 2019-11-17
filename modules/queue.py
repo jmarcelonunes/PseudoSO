@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 	Queue module
 	
@@ -13,7 +14,7 @@ from modules.process import Process
 class ProcessesQueue():
 	'''Ready processes queue'''
 
-	def __main__(self, processes : list):
+	def __main__(self):
 		# Max number of processes
 		self.max_procs = 1000
 		# Total number of processes in the queue
@@ -84,7 +85,7 @@ class ProcessesQueue():
 			return self.queue[k].pop(0)
 		return None
 
-class BloquedManager():
+class BloquedQueue():
 
 	def __init__(self, resources):
 		self.bloqued = []
