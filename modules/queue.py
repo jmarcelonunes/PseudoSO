@@ -82,6 +82,7 @@ class ProcessesQueue():
 		for k in self.queue.keys():
 			if len(self.queue[k]) == 0:
 				continue
+			self.queue_size -= 1
 			return self.queue[k].pop(0)
 		return None
 

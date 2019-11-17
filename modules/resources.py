@@ -22,9 +22,11 @@ class ResourceManager:
                 Exception with an error message
         """
         # Check if it is a real-time process trying to allocate a resource
-        if process.priority == 0 and (process.scanner or process.modem \
-                        or process.printer_cod or process.disk_cod):
-            raise Exception('Processos de tempo real não podem alocar recursos.')
+        if process.priority == 0:
+            if process.scanner or process.modem or process.printer_cod or process.disk_cod:
+                raise Exception('Processos de tempo real não podem alocar recursos.')
+            else:
+                return
 
         # Since it's not a real-time process, let's verify the resources availability
         proc_printer_idx = process.printer_cod -1
@@ -52,6 +54,8 @@ class ResourceManager:
         """
         try:
             self.resources_availability(process)
+            if process.priority == 0:
+                return
         except Exception as e:
             raise e
 
