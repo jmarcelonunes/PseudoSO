@@ -1,19 +1,22 @@
 from queue import ProcessesQueue
+from resources import ResourceManager # Acho que isso não faz sentido, tem q ter só 1 ResourceManager instanciado, um 
+from memory import Memory
 
 class Scheduler():
 
-    def __init__(self):
-        self.ready = ProcessesQueue()
-        self.blocked = []
-        self.waiting = []
-        self.finished = []
-        pass
+	def __init__(self, resource_manager, memory):
+		self.ready = ProcessesQueue()
+		self.blocked = []
+		self.waiting = []
+		self.finished = []
+		self.resource_m = resource_manager
+		self.mem_m = memory
 
     def update(self):
         # Aging
             # Na fila de prontos
-            # Todo clock aumenta a prioridade do primeiro processo que está
-				# na fila de prioridade 2 ou 3
+            # Todo clock aumenta a prioridade dos primeiros processos que estão
+				# nas filas de prioridade 2 e 3
 			ready.process_aging()
 		
         # Blocked processes
@@ -23,13 +26,16 @@ class Scheduler():
                     # Memória
                     # Quantidade de processos prontos - 1000
             # Adiciona na lista de prontos
-        pass
 
     def send_ready_process(self, processes):
         # Recebe novos processos
         # Adiciona na fila de prontos
 			for proc in processes:
-				ready.add(proc)
+				try:
+					mem_m.create_process(proc)
+					resource_m.resources_availability(proc)
+					resource_m.allocate(proc)
+					ready.add(proc)
 
     def get_process_to_execute(self):
         # verifica tempo de CPU do atual

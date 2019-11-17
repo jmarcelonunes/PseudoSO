@@ -93,6 +93,8 @@ def load_instructions(filename, processes):
 			process_by_init_time[p.init_time] = [p]
 
 	return process_by_init_time
+
+
 class Instruction():
 	def __init__(self, operation = -1, filename = None, filesize = -1):
 		self.operation = operation
@@ -110,29 +112,4 @@ class Instruction():
 		else:
 			string += 'Operação desconhecida'
 		return string
-
-class ProcessManager:
-	def __init__(self):
-		# tempo de cpu total
-		self.clock = 0
-		# pid que será atribuído ao próximo processo que será criado
-		self.new_pid = 0
-		# processo atualmente em execução
-		self.running_proc = None
-		self.running_pid = 0
-		# processos que já foram executados
-		self.executed_procs = []
-
-	def create_process(self, proc):
-		proc.pid = self.new_pid
-		self.new_pid += 1
-		# aloca o processo na memoria
-		self.memmngr.allocate(proc)
-		# alloca os recursos do processo 
-		self.resmngr.allocate(proc)
-		# o processo é adicionado à fia
-		self.qmngr.put(proc)
-
-	def next_process(self):
-		return None
 
