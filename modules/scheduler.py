@@ -10,6 +10,7 @@ class Scheduler():
         self.finished = []
         self.resource_m = resource_manager
         self.mem_m = memory
+        self.running = None
 
     def update(self):
         # Aging
@@ -31,7 +32,6 @@ class Scheduler():
         # Adiciona na fila de prontos
         for proc in processes:
             try:
-                mem_m.create_process(proc)
                 resource_m.allocate(proc)
                 ready.add(proc)
             except:
@@ -39,11 +39,13 @@ class Scheduler():
 
     def get_process_to_execute(self):
         # verifica tempo de CPU do atual
+
         #loop - enquanto filas n estiverem vazia
             # acha melhor candidato
             # Tempo n acabou
                 # se tiver prioridade maior
                     # verifica recurso de memória
+                    mem_m.create_process(proc)
                     # verifica recurso de IO
                         # retorna novo processo
             # Tempo de CPU acabou
