@@ -69,10 +69,9 @@ def process_launcher(clock, processes):
     return []
 
 def dispatch(process, memory, filesys, resources):
-    # alocação de memória
-    memory.create_process()
     # se novo processo imprimir informações gerais
-    if(process.running == False):
+    if process.new:
+        process.new = False
         print("Dispatcher =>")
         print("\tPID: %d", process.pid)
         print("\toffset: %d", memory.get_process_offset(process))
@@ -83,10 +82,7 @@ def dispatch(process, memory, filesys, resources):
         print("\tscanners: %d", process.scanner)
         print("\tmodems: %d", process.modem)
         print("\tdrives: %d", process.disk_cod)
-   
-    else: # caso contrário continuar execução
-       pass
-
+    
     if(process.total_exec_time > 0): #Ainda tem tempo de CPU disponivel
         print("\tprocess %d", process.pid)
         print("\tP%d STARTED", process.pid)
@@ -116,13 +112,15 @@ def dispatch(process, memory, filesys, resources):
         
         process.intructions_pc += 1
         process.exec_time -= 1
+        process.running = True
  
     else:
         memory.delete_process(process)
         resources.free(process)
         print("\tP%d instruction %d – FALHA", process.pid, process.intructions_pc)
         print("O processo %d esgotou o seu tempo de CPU!" , process.pid) 
-    
+        process.running = False
+
     
  
 def print_args_error():

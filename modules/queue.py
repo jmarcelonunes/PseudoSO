@@ -7,7 +7,7 @@
 	starvation it's used the aging technique.
 """
 
-from process import Process
+from modules.process import Process
 
 
 class ProcessesQueue():
@@ -38,7 +38,7 @@ class ProcessesQueue():
 			Returns:
 				added ('bool')
 		"""
-		if(is_queue_free()):
+		if(_is_queue_free()):
 			self.queue[process.priority].append(process)
 			self.queue_size += 1
 			return True
@@ -77,4 +77,36 @@ class ProcessesQueue():
 			return self.queue[k][0]
 		return None
 
+	def next(self):
+		for k in self.queue.keys():
+			if len(self.queue[k]) == 0:
+				continue
+			return self.queue[k].pop(0)
+		return None
 
+class BloquedManager():
+
+	def __init__(self, resources):
+		self.bloqued = []
+		self.resources = resources
+
+	def push(self, process):
+		self.bloqued.append(process)
+
+	def pop(self):
+		if len(self.bloqued) > 0:
+			return self.bloqued.pop(0)
+		else:
+			return None
+
+	def pop_ready(self):
+		ready = []
+		for idx, b in enumerate(self.bloqued):
+			try:
+				self.resources.allocate(b)
+				ready.append(b)
+				self.bloqued[idx] = None
+			except:
+				continue
+		self.bloqued = [b for b in self.blocked if b is not None]
+		return ready
