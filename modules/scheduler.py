@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-from modules.queue import ProcessesQueue, BloquedQueue
+from modules.queue import ProcessesQueue, BlockedQueue
 
 class Scheduler():
 
     def __init__(self, resource_manager, memory):
         
         self.ready = ProcessesQueue()
-        self.blocked = BloquedQueue(resource_manager)
+        self.blocked = BlockedQueue(resource_manager)
         self.waiting = []
         self.finished = []
         self.resource_m = resource_manager
@@ -21,7 +21,7 @@ class Scheduler():
         self.ready.process_aging()
 
         # Blocked processes
-        ready = self.bloqued.pop_ready()
+        ready = self.blocked.pop_ready()
         self.send_ready_process(ready)
         # Motivos
             # Recurso - Ex: Impressora

@@ -14,14 +14,14 @@ from modules.process import Process
 class ProcessesQueue():
 	'''Ready processes queue'''
 
-	def __main__(self):
+	def __init__(self):
 		# Max number of processes
 		self.max_procs = 1000
 		# Total number of processes in the queue
 		self.queue_size = 0
 		# Queue where the keys are the processes priorities and the values are
 		# lists of processes, one list per key
-		self.queue = {}
+		self.queue = {0:[], 1:[], 2:[], 3:[]}
 
 	def _is_queue_free(self):
 		"""
@@ -85,29 +85,29 @@ class ProcessesQueue():
 			return self.queue[k].pop(0)
 		return None
 
-class BloquedQueue():
+class BlockedQueue():
 
 	def __init__(self, resources):
-		self.bloqued = []
+		self.blocked = []
 		self.resources = resources
 
 	def push(self, process):
-		self.bloqued.append(process)
+		self.blocked.append(process)
 
 	def pop(self):
-		if len(self.bloqued) > 0:
-			return self.bloqued.pop(0)
+		if len(self.blocked) > 0:
+			return self.blocked.pop(0)
 		else:
 			return None
 
 	def pop_ready(self):
 		ready = []
-		for idx, b in enumerate(self.bloqued):
+		for idx, b in enumerate(self.blocked):
 			try:
 				self.resources.allocate(b)
 				ready.append(b)
-				self.bloqued[idx] = None
+				self.blocked[idx] = None
 			except:
 				continue
-		self.bloqued = [b for b in self.blocked if b is not None]
+		self.blocked = [b for b in self.blocked if b is not None]
 		return ready

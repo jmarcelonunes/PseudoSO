@@ -58,7 +58,7 @@ def main():
         scheduler.send_ready_process(proc_list)
         # escalonador retorna processo a ser executado
             # retorna sinal se eh pra trocar ou nao o processo atual
-        process_running = scheduler.get_process_to_execute()
+        process_running = scheduler.get_process_to_execute(process_running)
         # dispatcher
         dispatch(process_running, memory, filesys, resources)
         clock += 1
