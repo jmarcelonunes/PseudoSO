@@ -35,12 +35,12 @@ class FileSystem():
     # Cria a estrutura de arquivo e adiciona no sistema
     def create_file(self, instruction, process):
         name = instruction.filename
-        size = instruction.size
+        size = instruction.filesize
         if(name in self.ftable):
             raise Exception("Arquivo com nome inválido")
         else:
             if not self.__add_file(File(name, size, process)):
-                raise Exception("O processo %d não pode criar o arquivo %d por falta de espaço", process.pid, name)
+                raise Exception("O processo %d não pode criar o arquivo %d por falta de espaço" %(process.pid, name))
             file = self.ftable[name]
             return file
     # Deleta um arquivo do sistema pelo nome
@@ -52,7 +52,7 @@ class FileSystem():
         file = self.ftable[name]
         if( process.priority != 0 and
             file.process != process):
-            raise Exception("Processo %d não possui permissão de acesso", process.pid)
+            raise Exception("Processo %d não possui permissão de acesso" % process.pid)
         if not self.__remove_file(file):
             raise Exception("Erro ao remover arquivo %d", name)
 
@@ -66,14 +66,14 @@ class FileSystem():
                 return False
         
         self.disk[file.start : file.end] =  file.size * file.name
-        self.ftable[file.name] = file.name
+        self.ftable[file.name] = file
         return True
 
     # Remove um arquivo do sistema
     def __remove_file(self, file):
         if(file.name not in self.ftable):
             return False
-        self.disk[file.start : file.end] =  file.size * None
+        self.disk[file.start : file.end] =  file.size * [None]
         del self.ftable[file.name]
         return True
 
@@ -99,7 +99,7 @@ class FileSystem():
             if block is None:
                 string += ' |'
             else:
-                string += block.name + '|'
+                string += block + '|'
 
         string += '\n'
         return string
@@ -110,7 +110,10 @@ class File():
         self.name = name
         self.start = start
         self.size = size
-        self.end = start + size
+        if start is None:
+            self.end = None
+        else:
+            self.end = start + size
 
     def set_start(self, idx):
         self.start = idx

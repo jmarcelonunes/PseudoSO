@@ -43,7 +43,7 @@ class Process:
 
 def load_processes(processes_txt,files_txt):
 	processes_dict = read_processes(filename = processes_txt)
-	processes = []
+	processes = {}
 	for key, p in enumerate(processes_dict):
 		new_process = Process(
 			p['init_time'], 
@@ -56,7 +56,7 @@ def load_processes(processes_txt,files_txt):
 			p['disk_cod'],
 			pid = key
 		)
-		processes.append(new_process)
+		processes[key] = new_process
 	return load_instructions(files_txt, processes)
 
 def load_instructions(filename, processes):
@@ -71,7 +71,7 @@ def load_instructions(filename, processes):
 			data = line.split(',')
 			process_id = int(data[0])
 			operation = int(data[1])
-			filename = data[2]
+			filename = data[2].strip()
 			if len(data) == 5:
 				filesize = int(data[3])
 				pc = int(data[4])
@@ -91,7 +91,8 @@ def load_instructions(filename, processes):
 
 def processes_by_init_time(processes):
 	process_by_init_time = {}
-	for p in processes:
+	for key in processes.keys():
+		p = processes[key]
 		if p.init_time in process_by_init_time:
 			process_by_init_time[p.init_time].append(p)
 		else:    

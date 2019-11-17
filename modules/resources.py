@@ -51,7 +51,7 @@ class ResourceManager:
                 process ('obj') a Process.
         """
         try:
-            resources_availability(process)
+            self.resources_availability(process)
         except Exception as e:
             raise e
 

@@ -47,14 +47,18 @@ class Scheduler():
     def pop_waiting(self):
         # Recebe novos processos
         # Adiciona na fila de prontos
-        for proc in self.waiting:
+        if self.waiting:
+            proc = self.waiting[0]
+            try:  
+                self.mem_m.create_process(proc)
+                self.waiting.pop(0)
+            except:
+                return
             try:
                 self.resource_m.allocate(proc)
-                self.mem_m.create_process(proc)
                 self.ready.add(proc)
             except:
-                self.waiting.append(proc)
-
+                self.blocked.push(proc)
 
     def get_process_to_execute(self, running_process):
         # verifica tempo de CPU do atual
@@ -63,7 +67,10 @@ class Scheduler():
             prio = running_process.priority
             if not is_running:
                 self.mem_m.delete_process(running_process)
+                self.resource_m.free(running_process)
                 self.blocked.pop_ready()
+                self.pop_waiting()
+                running_process = None
         else:
             is_running = False
         #loop - enquanto filas n estiverem vazia
@@ -73,26 +80,21 @@ class Scheduler():
             # Tempo n acabou
             # se tiver prioridade maior
             if is_running:
-                if prio != 0 and prio <= next.priority:  
-                    # verifica recurso de memória
-                    next = self.verify_requirements(next)
-                    if  next is not None:
-                        return next
+                if prio != 0 and prio <= next.priority:
+                    return self.ready.next()
                 else:
                     return running_process
             else: # Tempo de CPU acabou
-                next = self.verify_requirements(next)
-                if  next is not None:
-                    return next # retorna melhor candidato
+                return self.ready.next() # retorna melhor candidato
+            
             next = self.ready.get_next()
          # retorna IDLE
-        return None
+        return running_process
 
-    def verify_requirements(self, next):
-        try:
-            self.mem_m.create_process(next)
-            return self.ready.next()
-        except:
-            blocked_process = self.ready.next()
-            self.blocked.push(blocked_process)
-            return None
+    # def verify_requirements(self, next):
+    #     try:
+    #         return self.ready.next()
+    #     except:
+    #         blocked_process = self.ready.next()
+    #         self.blocked.push(blocked_process)
+    #         return None

@@ -17,7 +17,7 @@ class Memory:
   
         pid = process.pid
         prio = process.priority
-        numblock = process.numblock
+        numblock = process.blocks
         #Check process priority
         partition = self.memory_real_time if prio == 0 else self.memory_user
         holes = partition.holes

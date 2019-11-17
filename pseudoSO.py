@@ -6,7 +6,7 @@ from modules.scheduler import Scheduler
 from modules.memory import Memory
 from modules.resources import ResourceManager
 
-GLOBAL_processes = []
+GLOBAL_processes = {}
 GLOBAL_clock = 0
 
 def main():
@@ -21,10 +21,10 @@ def main():
     process_filename = args[0]
     files_filename = args[1]
 
-    GLOBAL_clock = 0
 
     # Inicializar sistemas 
-
+    global GLOBAL_clock
+    global GLOBAL_processes
     GLOBAL_processes = load_processes(process_filename, files_filename)
     processes = processes_by_init_time(GLOBAL_processes)
     memory = Memory()
@@ -42,7 +42,7 @@ def main():
 
    
     process_running = None 
-    print(GLOBAL_processes)
+    print(GLOBAL_clock)
     # loop pelo clock ate lista de processos gerais ficar vazia
     while GLOBAL_processes:
         # timer (clock)
@@ -65,6 +65,7 @@ def main():
         
         GLOBAL_clock += 1
         print(GLOBAL_clock)
+    print(filesys)
 
 def process_launcher(clock, processes):
     if clock in processes:
@@ -80,54 +81,53 @@ def dispatch(process, memory, filesys, resources):
     if process.new:
         process.new = False
         print("Dispatcher =>")
-        print("\tPID: %d", process.pid)
-        print("\toffset: %d", memory.get_process_offset(process))
-        print("\tblocks: %d", process.blocks)
-        print("\tpriority: %d", process.priority)
-        print("\ttime: %d", process.total_exec_time)
-        print("\tprinters: %d", process.printer_cod)
-        print("\tscanners: %d", process.scanner)
-        print("\tmodems: %d", process.modem)
-        print("\tdrives: %d", process.disk_cod)
+        print("\tPID: %d" % process.pid)
+        print("\toffset: %d" % memory.get_process_offset(process))
+        print("\tblocks: %d" % process.blocks)
+        print("\tpriority: %d" % process.priority)
+        print("\ttime: %d" % process.total_exec_time)
+        print("\tprinters: %d" % process.printer_cod)
+        print("\tscanners: %d" % process.scanner)
+        print("\tmodems: %d" % process.modem)
+        print("\tdrives: %d" % process.disk_cod)
+        print("process %d => " % process.pid)
+        print("P%d STARTED" % process.pid)
     
-    if(process.total_exec_time > 0): #Ainda tem tempo de CPU disponivel
-        print("\tprocess %d", process.pid)
-        print("\tP%d STARTED", process.pid)
+    if(process.exec_time > 0): #Ainda tem tempo de CPU disponivel
+       
         if process.intructions_pc in process.instructions:
-            if(process.instructutions[process.intructions_pc].operation == 0): #criacao de arquivo
+            if(process.instructions[process.intructions_pc].operation == 0): #criacao de arquivo
                 try:
-                    f = filesys.create_file(process.instructutions[process.intructions_pc], process)
+                    f = filesys.create_file(process.instructions[process.intructions_pc], process)
                     filename = f.name
                     start = f.start
                     end = f.end
-                    print("\tO processo %d criou o arquivo %c (blocos %d e %d).", process.pid, filename, start, end)
+                    print("O processo %d criou o arquivo %c (blocos %d e %d)." % (process.pid, filename, start, (end-1)))
                 except Exception as e:
-                    print("\tP%d instruction %d – FALHA", process.pid, process.intructions_pc)
+                    print("P%d instruction %d – FALHA" % (process.pid, process.intructions_pc))
                     print(e)
 
-            if(process.instructutions[process.intructions_pc].operation == 1): #deletar arquivo
+            if(process.instructions[process.intructions_pc].operation == 1): #deletar arquivo
                 try:
-                    filesys.delete_file(process.instructutions[process.intructions_pc], process)
-                    filename = process.instructutions[process.intructions_pc].filename
-                    print("\tO processo %d deletou o arquivo %c (blocos 3 e 4).", process.pid, filename)
+                    filesys.delete_file(process.instructions[process.intructions_pc], process)
+                    filename = process.instructions[process.intructions_pc].filename
+                    print("O processo %d deletou o arquivo %c." % (process.pid, filename))
                 except Exception as e:
-                    print("\tP%d instruction %d – FALHA", process.pid, process.intructions_pc)
+                    print("P%d instruction %d – FALHA" % (process.pid, process.intructions_pc))
                     print(e)
                 
         else:
-            print("\tP%d instruction %d – SUCESSO CPU", process.pid, process.intructions_pc)
+            print("P%d instruction %d – SUCESSO CPU" % (process.pid, process.intructions_pc))
         
         process.intructions_pc += 1
         process.exec_time -= 1
         process.running = True
  
     else:
-        memory.delete_process(process)
-        resources.free(process)
-        print("\tP%d instruction %d – FALHA", process.pid, process.intructions_pc)
-        print("O processo %d esgotou o seu tempo de CPU!" , process.pid) 
+        print("P%d instruction %d – FALHA" % (process.pid, process.intructions_pc))
+        print("O processo %d esgotou o seu tempo de CPU!" % process.pid) 
         process.running = False
-        GLOBAL_processes.pop(process.pid)
+        del GLOBAL_processes[process.pid]
 
     
  
