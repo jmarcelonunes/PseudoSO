@@ -15,7 +15,8 @@ def main():
     args = sys.argv[1:]
 
     if args_length != 2:
-        print_args_error()
+        print('Quantidade inválida de argumentos. Devem ser informados 2: primeiro o arquivo que contém informações ' +\
+            'dos processos e segundo o arquivo relacionado ao sistema de arquivos.')
         return 0
     
     process_filename = args[0]
@@ -130,11 +131,6 @@ def dispatch(process, memory, filesys, resources):
         print("O processo %d esgotou o seu tempo de CPU!" % process.pid) 
         process.running = False
         del GLOBAL_processes[process.pid]
-
-    
- 
-def print_args_error():
-    pass
 
 if __name__ == '__main__':
     main()

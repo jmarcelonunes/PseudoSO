@@ -93,11 +93,4 @@ class Scheduler():
             next = self.ready.get_next()
          # retorna IDLE
         return running_process
-
-    # def verify_requirements(self, next):
-    #     try:
-    #         return self.ready.next()
-    #     except:
-    #         blocked_process = self.ready.next()
-    #         self.blocked.push(blocked_process)
-    #         return None
+        
