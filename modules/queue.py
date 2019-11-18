@@ -45,9 +45,6 @@ class ProcessesQueue():
 			return True
 		return False
 
-	def remove(self, process):
-		pass
-
 	def process_aging(self):
 		"""
 			Updates the priority of the processes at index 0 in the lists of

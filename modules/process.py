@@ -17,7 +17,6 @@ class Process:
 		self.scanner = scanner
 		self.modem = modem
 		self.disk_cod = disk_cod
-		self.pc = self.total_exec_time + self.init_time
 		# pid deve ser atribuído pelo gerenciador de processos
 		self.pid = pid
 		self.instructions = {}
