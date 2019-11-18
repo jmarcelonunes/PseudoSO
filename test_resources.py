@@ -3,8 +3,8 @@
 """
 
 
-from resources import ResourceManager
-from process import Process
+from modules.resources import ResourceManager
+from modules.process import Process
 
 def original_procs():
 	return [{'priority': 0, 'printer_cod': 0, 'scanner': 0, 'modem': 0, 'disk_cod': 0}, \
@@ -13,15 +13,15 @@ def original_procs():
 procs_descr = original_procs()
 resmngr = ResourceManager()
 
-# Teste do método resources_availability()
+# Teste do método _resources_availability()
 for i, proc in enumerate(procs_descr):
 	print('Verificação de disponibilidade de recursos do processo {i}...')
-	assert resmngr.resources_availability(proc) == []
+	assert resmngr._resources_availability(proc) == []
 
 # Processo com prioridade 0 (de tempo real) tentando utilizar scanner
 procs_descr[0]['scanner'] = 1
 print('\nVerificação de disponibilidade de recursos do processo 0, prioridade 0, scanner 1...')
-err_msgs = resmngr.resources_availability(procs_descr[0])
+err_msgs = resmngr._resources_availability(procs_descr[0])
 assert len(err_msgs) == 1
 print(err_msgs)
 procs_descr = original_procs()
@@ -30,7 +30,7 @@ err_msgs = []
 # Processo com prioridade 0 (de tempo real) tentando utilizar impressora 1
 procs_descr[0]['printer_cod'] = 1
 print('\nVerificação de disponibilidade de recursos do processo 0, prioridade 0, printer 1...')
-err_msgs = resmngr.resources_availability(procs_descr[0])
+err_msgs = resmngr._resources_availability(procs_descr[0])
 assert len(err_msgs) == 1
 print(err_msgs)
 procs_descr = original_procs()
@@ -45,7 +45,7 @@ procs_descr[0]['disk_cod'] = 2
 process1 = Process(priority=1, printer_cod=1, scanner=0, modem=1, disk_cod=2, init_time=0, total_exec_time=0, blocks=0)
 resmngr.allocate(process1)
 print("\nVerificação de disponibilidade do modem e do disco para o processo 0...")
-err_msgs = resmngr.resources_availability(procs_descr[0])
+err_msgs = resmngr._resources_availability(procs_descr[0])
 assert len(err_msgs) == 2
 print(err_msgs)
 err_msgs = []
@@ -53,7 +53,7 @@ err_msgs = []
 # Teste do método free()
 resmngr.free(process1)
 print("\nVerificação de disponibilidade do modem e do disco para o processo 0 depois de chamar free()...")
-err_msgs = resmngr.resources_availability(procs_descr[0])
+err_msgs = resmngr._resources_availability(procs_descr[0])
 assert len(err_msgs) == 0
 print(err_msgs)
 

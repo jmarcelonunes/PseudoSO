@@ -13,7 +13,7 @@ class ResourceManager:
         # A resource with value of 0 means it's free, otherwise it's being used
         self.resources = {'scanner': 0, 'printers': [0, 0], 'modem': 0, 'disks': [0, 0]}
 
-    def resources_availability(self, process):
+    def _resources_availability(self, process):
         """
             Verifies if the process has permission to allocate the resources (if it's 
             a real-time or not) and if the resources are available or not, raising 
@@ -47,13 +47,13 @@ class ResourceManager:
 
     def allocate(self, process):
         """
-            Allocates all the resources the process is requesting. It's assumed
-            that the resources_availability() was already called.
+            Allocates all the resources the process is requesting. _resources_availability() 
+            is called here.
             Args:
                 process ('obj') a Process.
         """
         try:
-            self.resources_availability(process)
+            self._resources_availability(process)
             if process.priority == 0:
                 return
         except Exception as e:
@@ -70,8 +70,11 @@ class ResourceManager:
 
     def free(self, process):
         """
-            Deallocates every resource used by the process.
+            Deallocates every resource used by the process if it's a user process.
         """
+        if process.priority == 0:
+            return
+
         if process.scanner:
             self.resources['scanner'] = 0
         if process.modem:
