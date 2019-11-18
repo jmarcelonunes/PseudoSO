@@ -103,8 +103,8 @@ class BlockedQueue():
 		for idx, b in enumerate(self.blocked):
 			try:
 				self.resources.allocate(b)
-				ready.append(b)
 				self.blocked[idx] = None
+				ready.append(b)
 			except:
 				continue
 		self.blocked = [b for b in self.blocked if b is not None]

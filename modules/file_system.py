@@ -52,7 +52,7 @@ class FileSystem():
         file = self.ftable[name]
         if( process.priority != 0 and
             file.process != process):
-            raise Exception("Processo %d não possui permissão de acesso" % process.pid)
+            raise Exception("Processo %d não possui permissão de acesso para o arquivo %c" %(process.pid, name))
         if not self.__remove_file(file):
             raise Exception("Erro ao remover arquivo %d", name)
 
@@ -92,10 +92,10 @@ class FileSystem():
 
     def __str__(self):
         string = 'Mapa de ocupação do disco\n'
-        string += '|'
+        string += '\n0\t|'
         for idx, block in enumerate(self.disk):
-            if idx % 10 == 0:
-                string += '\n|'
+            if idx % 10 == 0 and idx != 0:
+                string += f'\n{idx}\t|'
             if block is None:
                 string += ' |'
             else:

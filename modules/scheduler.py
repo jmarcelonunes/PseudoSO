@@ -13,21 +13,27 @@ class Scheduler():
         self.mem_m = memory
         self.running = None
         
-    def update(self):
+    def update(self, running_process):
         # Aging
         # Na fila de prontos
         # Todo clock aumenta a prioridade dos primeiros processos que estão
         # nas filas de prioridade 2 e 3
-        self.ready.process_aging()
-
+        if running_process is not None:
+            if not running_process.running:
+                self.mem_m.delete_process(running_process)
+                self.resource_m.free(running_process)
         # Blocked processes
         ready = self.blocked.pop_ready()
-        self.send_ready_process(ready)
+        for p in ready:
+            self.ready.add(p)
         # Motivos
             # Recurso - Ex: Impressora
             # Recuros do sistema
             # Quantidade de processos prontos - 1000
             # Adiciona na lista de prontos
+        self.pop_waiting()
+        self.ready.process_aging()
+
 
     def send_ready_process(self, processes):
         # Recebe novos processos
@@ -66,10 +72,6 @@ class Scheduler():
             is_running = running_process.running
             prio = running_process.priority
             if not is_running:
-                self.mem_m.delete_process(running_process)
-                self.resource_m.free(running_process)
-                self.blocked.pop_ready()
-                self.pop_waiting()
                 running_process = None
         else:
             is_running = False
@@ -80,7 +82,8 @@ class Scheduler():
             # Tempo n acabou
             # se tiver prioridade maior
             if is_running:
-                if prio != 0 and prio <= next.priority:
+                if prio != 0 and prio >= next.priority:
+                    self.ready.add(running_process)
                     return self.ready.next()
                 else:
                     return running_process

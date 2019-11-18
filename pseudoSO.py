@@ -53,7 +53,7 @@ def main():
         # atualiza escalonador
             # checar bloqueados no escalonador
             # atualizar escalonador (aging)
-        scheduler.update()
+        scheduler.update(process_running)
         # forma pacote de processos
         # envia pacote para o escalonador
         scheduler.send_ready_process(proc_list)
@@ -64,7 +64,7 @@ def main():
         dispatch(process_running, memory, filesys, resources)
         
         GLOBAL_clock += 1
-        print(GLOBAL_clock)
+        #print(GLOBAL_clock)
     print(filesys)
 
 def process_launcher(clock, processes):
@@ -102,6 +102,7 @@ def dispatch(process, memory, filesys, resources):
                     filename = f.name
                     start = f.start
                     end = f.end
+                    print("P%d instruction %d – SUCESSO" % (process.pid, process.intructions_pc))
                     print("O processo %d criou o arquivo %c (blocos %d e %d)." % (process.pid, filename, start, (end-1)))
                 except Exception as e:
                     print("P%d instruction %d – FALHA" % (process.pid, process.intructions_pc))
@@ -111,6 +112,7 @@ def dispatch(process, memory, filesys, resources):
                 try:
                     filesys.delete_file(process.instructions[process.intructions_pc], process)
                     filename = process.instructions[process.intructions_pc].filename
+                    print("P%d instruction %d – SUCESSO" % (process.pid, process.intructions_pc))
                     print("O processo %d deletou o arquivo %c." % (process.pid, filename))
                 except Exception as e:
                     print("P%d instruction %d – FALHA" % (process.pid, process.intructions_pc))
