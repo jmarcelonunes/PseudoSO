@@ -40,7 +40,7 @@ class FileSystem():
             raise Exception("Arquivo com nome inválido")
         else:
             if not self.__add_file(File(name, size, process)):
-                raise Exception("O processo %d não pode criar o arquivo %d por falta de espaço" %(process.pid, name))
+                raise Exception("O processo %d não pode criar o arquivo %c por falta de espaço" %(process.pid, name))
             file = self.ftable[name]
             return file
     # Deleta um arquivo do sistema pelo nome
@@ -110,6 +110,7 @@ class File():
         self.name = name
         self.start = start
         self.size = size
+        self.process = process
         if start is None:
             self.end = None
         else:

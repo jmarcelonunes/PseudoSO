@@ -86,7 +86,8 @@ def load_instructions(filename, processes):
 					operation = operation,
 					filename = filename
 				)
-			processes[process_id].instructions[pc] = inst
+			if process_id in processes:
+				processes[process_id].instructions[pc] = inst
 	return processes
 
 def processes_by_init_time(processes):
